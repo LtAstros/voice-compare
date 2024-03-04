@@ -1,14 +1,14 @@
 import video from './assets/video-placeholder.png';
 import { useEffect, useRef, useState } from 'react'
 import './App.css'
-// import RecordingButton from './components/RecordingButton';
 
 function App() {
     const [isRecording, setIsRecording] = useState(false)
+    // Permission will be used to modify page content
     const [permission, setPermission] = useState()
     const [audioURL, setAudioURL] = useState(null)
-    let mediaStream = useRef(null)
-    let audioRecord = useRef(null)
+    const mediaStream = useRef(null)
+    const audioRecorder = useRef(null)
 
     useEffect(() => {
         async function getPermission() {
@@ -20,7 +20,7 @@ function App() {
 
     function dataCallback(e) {
         if (e.data.size === 0) return;
-        const chunk = e.data
+        const chunk = new Blob([e.data], {type: "audio/wav" })
         const audioUrl = URL.createObjectURL(chunk);
         setAudioURL(audioUrl)
     }
@@ -28,26 +28,32 @@ function App() {
     async function startRecording() {
         try {
             mediaStream.current = await navigator.mediaDevices.getUserMedia({video: false, audio:true})
-            audioRecord.current = new MediaRecorder(mediaStream.current)
-            audioRecord.current.start()
-            audioRecord.current.ondataavailable = dataCallback
+            audioRecorder.current = new MediaRecorder(mediaStream.current)
+            audioRecorder.current.start()
+            audioRecorder.current.ondataavailable = dataCallback
             setIsRecording(true)
         } catch (err) {
-            console.error(`you got an error: ${err}`)
+            alert(`You got an error: ${err}`)
         }
     }
 
     function stopRecording(){
-        audioRecord.current.stop()
+        audioRecorder.current.stop()
         mediaStream.current.getTracks().forEach(track => {
             track.stop()
         })
         setIsRecording(false)
     }
 
+    async function placeholderAPICall(){
+        const response = await fetch("https://dummy.restapiexample.com/api/v1/employees");
+        const data = await response.json();
+        console.log(data);
+    }
+
     function RecordingButton({isRecording}){
         if (isRecording) {
-            return <button onClick={stopRecording} className='rounded-lg bg-blue-700 hover:bg-blue-950 p-2 text-slate-200 text-xl'>Stop</button>
+            return <button onClick={stopRecording} className='rounded-lg bg-red-700 hover:bg-red-950 p-2 text-slate-200 text-xl'>Stop</button>
         }
         return <button onClick={startRecording} className='rounded-lg bg-blue-700 hover:bg-blue-950 p-2 text-slate-200 text-xl'>Start</button>
     }
@@ -57,9 +63,10 @@ function App() {
         <h1 className="text-5xl font-bold text-slate-200">Voice Compare</h1>
         <img src={video} alt="video-player" className="size-2/5 max-w-2xl"/>
         <audio src={audioURL} className="w-2/5 max-w-2xl mx-auto" controls={audioURL === null ? false : true}></audio>
+        {/* {audioURL !== null && <a download href={audioURL}>Download Recording</a>} */}
         <div className='grid grid-cols-2 gap-4 mt-4 size-2/5 max-w-2xl'>
             <RecordingButton isRecording={isRecording}></RecordingButton>
-            <button onClick={startRecording} className='rounded-lg bg-blue-700 hover:bg-blue-950 p-2 text-slate-200 text-xl'>Test Permissions</button>
+            <button onClick={placeholderAPICall} className='rounded-lg bg-blue-700 hover:bg-blue-950 p-2 text-slate-200 text-xl'>Test Request</button>
         </div>
         </div>
     );
