@@ -7,6 +7,7 @@ function App() {
     // Permission will be used to modify page content
     const [permission, setPermission] = useState()
     const [audioURL, setAudioURL] = useState(null)
+    const [audioBlob, setAudioBlob] = useState(null)
     const mediaStream = useRef(null)
     const audioRecorder = useRef(null)
 
@@ -22,6 +23,7 @@ function App() {
         if (e.data.size === 0) return;
         const chunk = new Blob([e.data], {type: "audio/wav" })
         const audioUrl = URL.createObjectURL(chunk);
+        setAudioBlob(chunk)
         setAudioURL(audioUrl)
     }
 
@@ -46,7 +48,9 @@ function App() {
     }
 
     async function placeholderAPICall(){
-        const response = await fetch("https://dummy.restapiexample.com/api/v1/employees");
+        let formData = new FormData();
+        formData.append("audio_file", audioBlob);
+        const response = await fetch(uploadURL, {method: "POST", cache: "no-cache", body: formData})
         const data = await response.json();
         console.log(data);
     }
