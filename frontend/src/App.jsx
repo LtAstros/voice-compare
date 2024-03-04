@@ -48,10 +48,10 @@ function App() {
     }
 
     async function placeholderAPICall(){
-        let formData = new FormData();
-        formData.append("audio_file", audioBlob);
-        const response = await fetch(uploadURL, {method: "POST", cache: "no-cache", body: formData})
-        const data = await response.json();
+        let formData = "formData";//new FormData();
+        //formData.append("audio_file", audioBlob);
+        const response = await fetch('http://127.0.0.1:8000/files/', {method: "POST", cache: "no-cache", body: formData, mode: "no-cors"})
+        const data = await response;
         console.log(data);
     }
 
