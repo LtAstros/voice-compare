@@ -21,7 +21,7 @@ function App() {
 
     function dataCallback(e) {
         if (e.data.size === 0) return;
-        const chunk = new Blob([e.data], {type: "audio/wav" })
+        const chunk = new Blob([e.data], {type: "audio/mp3" })
         const audioUrl = URL.createObjectURL(chunk);
         setAudioBlob(chunk)
         setAudioURL(audioUrl)
@@ -48,11 +48,17 @@ function App() {
     }
 
     async function placeholderAPICall(){
-        let formData = "formData";//new FormData();
-        //formData.append("audio_file", audioBlob);
-        const response = await fetch('http://127.0.0.1:8000/files/', {method: "POST", cache: "no-cache", body: formData, mode: "no-cors"})
-        const data = await response;
-        console.log(data);
+        let formData = new FormData();
+        formData.append("file", audioBlob);
+        try {
+            // const response = await fetch('http://127.0.0.1:8000/files/', {method: "POST", cache: "no-cache", headers: {"content-type": "application/json"}, body: JSON.stringify({ word: "user" })})
+            const response = await fetch('http://127.0.0.1:8000/audio/', {method: "POST", body: formData})
+            const data = await response.json();
+            console.log(data);
+        } catch (error) {
+            console.error(error);
+            alert(error)
+        }
     }
 
     function RecordingButton({isRecording}){
@@ -67,7 +73,6 @@ function App() {
         <h1 className="text-5xl font-bold text-slate-200">Voice Compare</h1>
         <img src={video} alt="video-player" className="size-2/5 max-w-2xl"/>
         <audio src={audioURL} className="w-2/5 max-w-2xl mx-auto" controls={audioURL === null ? false : true}></audio>
-        {/* {audioURL !== null && <a download href={audioURL}>Download Recording</a>} */}
         <div className='grid grid-cols-2 gap-4 mt-4 size-2/5 max-w-2xl'>
             <RecordingButton isRecording={isRecording}></RecordingButton>
             <button onClick={placeholderAPICall} className='rounded-lg bg-blue-700 hover:bg-blue-950 p-2 text-slate-200 text-xl'>Test Request</button>
