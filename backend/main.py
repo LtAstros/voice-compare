@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from resemblyzer import preprocess_wav, VoiceEncoder
 from scipy.io.wavfile import write
 import numpy as np
+# import audiotools
 
 class Data(BaseModel):
     word: str
@@ -40,13 +41,16 @@ async def create_file(data: Data):
     }
 
 @app.post("/audio/")
-async def create_file(file: UploadFile):
+async def audio_process(file: UploadFile):
     audio_bytes = await file.read()
     test_file = open("temp.wav", "wb")
     test_file.write(audio_bytes)
-    test_file.close
+    test_file.close()
     audio = encoder.embed_utterance(preprocess_wav("test.wav"))
     compare_audio = encoder.embed_utterance(preprocess_wav("temp.wav"))
     print(np.inner(audio, compare_audio))
+    similarity_score = np.inner(audio, compare_audio)
+    print(type(similarity_score))
     return {"name": file.filename,
-            "type": file.content_type}
+            "type": file.content_type,
+            "score": float(similarity_score)}
