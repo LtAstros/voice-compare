@@ -68,39 +68,42 @@ function App() {
             console.log(data);
         } catch (error) {
             alert(error)
+            setSimilarityScore(null)
             console.error(error);
         }
     }
 
     function RecordingButton({isRecording}){
         if (isRecording) {
-            return <button onClick={stopRecording} className='rounded-lg bg-red-700 hover:bg-red-950 p-2 text-slate-200 text-xl'>Stop</button>
+            return <button onClick={stopRecording} className='rounded bg-red-700 hover:bg-red-950 p-2 text-slate-200 text-xl'>Stop</button>
         }
-        return <button onClick={startRecording} className='rounded-lg bg-blue-700 hover:bg-blue-950 p-2 text-slate-200 text-xl'>Start</button>
+        return <button onClick={startRecording} className='rounded bg-blue-700 hover:bg-blue-950 p-2 text-slate-200 text-xl'>Record</button>
     }
 
     function SubmitButton({audioURL}){
         if (audioURL) {
-            return <button onClick={placeholderAPICall} className={`rounded-lg bg-blue-700 hover:bg-blue-950 p-2 text-slate-200 text-xl`}>Compare Audio</button>
+            return <button onClick={placeholderAPICall} className="rounded bg-blue-700 hover:bg-blue-950 p-2 text-slate-200 text-xl">Compare</button>
         }
-        return <button className={`rounded-lg bg-blue-300 p-2 text-slate-200 text-xl`}>Compare Audio</button>
+        return <button className="rounded bg-blue-300 p-2 text-slate-200 text-xl">Compare</button>
     }
 
     return (
-        <div className="flex flex-col justify-center items-center bg-stone-800 min-h-screen overflow-hidden font-sans">
-        <h1 className="text-5xl font-bold text-slate-200">Voice Compare</h1>
-        <img src={video} alt="video-player" className="size-2/5 max-w-2xl"/>
-        <h2 className="text-3xl font-bold text-slate-200">Try to copy this audio!</h2>
-        <audio className="w-2/5 max-w-xl mx-auto" controls>
-            <source src={audio} type="audio/wav"/>
-        </audio>
-        {audioURL !== null && <h2 className="text-3xl font-bold text-slate-200">Your Recording:</h2>}
-        <audio src={audioURL} className="w-2/5 max-w-xl mx-auto" controls={audioURL === null ? false : true}></audio>
-        {similarityScore !== null && <h2 className="text-3xl font-bold text-slate-200">{similarityScore === "loading" ? "Loading..." : `Your score is: ${similarityScore.toFixed(2)}`}</h2>}
-        <div className='grid grid-cols-2 gap-4 mt-4 size-2/5 max-w-2xl'>
-            <RecordingButton isRecording={isRecording}></RecordingButton>
-            <SubmitButton audioURL={audioURL}></SubmitButton>
-        </div>
+        <div className="flex flex-col items-center h-full w-full font-sans relative">
+            <div className="flex flex-col items-center w-full max-w-lg font-sans">
+                <h1 className="text-5xl font-bold text-slate-200 p-5">Voice Compare</h1>
+                <iframe className="w-full aspect-video" src="https://www.youtube.com/embed/PuC40Nk7Ggc?si=qKbIn5QQiRRXlwRX" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                <h2 className="text-3xl font-bold text-slate-200 p-2">Try to copy the clip!</h2>
+                {/* <audio className="w-full" controls>
+                    <source src={audio} type="audio/wav"/>
+                </audio> */}
+                {audioURL !== null && <h2 className="text-3xl font-bold text-slate-200 p-2">Your Recording:</h2>}
+                <audio src={audioURL} className="w-full" controls={audioURL === null ? false : true}></audio>
+                {similarityScore !== null && <h2 className="text-3xl font-bold text-slate-200">{similarityScore === "loading" ? "Loading..." : `Your score is: ${similarityScore.toFixed(2)}`}</h2>}
+                <div className='grid grid-cols-2 gap-4 mt-4 w-full'>
+                    <RecordingButton isRecording={isRecording}></RecordingButton>
+                    <SubmitButton audioURL={audioURL}></SubmitButton>
+                </div>
+            </div>
         </div>
     );
 }
