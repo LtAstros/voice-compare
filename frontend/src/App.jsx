@@ -1,5 +1,5 @@
-import video from './assets/video-placeholder.png';
 import audio from './assets/test.wav'
+import ScoreList from './components/ScoreList';
 import { useEffect, useRef, useState } from 'react'
 import { MediaRecorder, register } from 'extendable-media-recorder';
 import { connect } from 'extendable-media-recorder-wav-encoder';
@@ -12,6 +12,7 @@ function App() {
     const [audioURL, setAudioURL] = useState(null)
     const [audioBlob, setAudioBlob] = useState(null)
     const [similarityScore, setSimilarityScore] = useState(null)
+    const [topScores, setTopScores] = useState([])
     const mediaStream = useRef(null)
     const audioRecorder = useRef(null)
 
@@ -24,6 +25,7 @@ function App() {
             let status = await navigator.permissions.query({name:'microphone'})
             status.onchange = () => {setPermission(status.state)}
         }
+
         setUpConnection()
         getPermission()
     }, [])
@@ -56,16 +58,24 @@ function App() {
         setIsRecording(false)
     }
 
+    function updateTopScores(score){
+            let new_item = {url:audioURL,score:score}
+            let scores = [...topScores]
+            scores.push(new_item)
+            scores.sort((a,b) => a.score < b.score ? 1 : -1)
+            console.log(scores)
+            setTopScores(scores.slice(0,5))
+    }
+
     async function placeholderAPICall(){
         let formData = new FormData();
-        // formData = {word:"hi"}
         formData.append("file", audioBlob, 'audio.wav');
         try {
             setSimilarityScore("loading")
             const response = await fetch('http://127.0.0.1:8000/audio/', {method: "POST", body: formData})
             const data = await response.json();
-            setSimilarityScore(data.score)
-            console.log(data);
+            setSimilarityScore(data.score);
+            updateTopScores(data.score)
         } catch (error) {
             alert(error)
             setSimilarityScore(null)
@@ -91,18 +101,26 @@ function App() {
         <div className="flex flex-col items-center h-full w-full font-sans relative">
             <div className="flex flex-col items-center w-full max-w-lg font-sans">
                 <h1 className="text-5xl font-bold text-slate-200 p-5">Voice Compare</h1>
-                <iframe className="w-full aspect-video" src="https://www.youtube.com/embed/PuC40Nk7Ggc?si=qKbIn5QQiRRXlwRX" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                <iframe className="w-full aspect-video" src="https://www.youtube.com/embed/PuC40Nk7Ggc?si=qKbIn5QQiRRXlwRX" title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
                 <h2 className="text-3xl font-bold text-slate-200 p-2">Try to copy the clip!</h2>
-                {/* <audio className="w-full" controls>
+                <audio className="w-full" controls>
                     <source src={audio} type="audio/wav"/>
-                </audio> */}
-                {audioURL !== null && <h2 className="text-3xl font-bold text-slate-200 p-2">Your Recording:</h2>}
+                </audio>
+                {audioURL !== null && <h2 className="text-3xl font-bold text-slate-200 p-2">Your Recent Recording:</h2>}
                 <audio src={audioURL} className="w-full" controls={audioURL === null ? false : true}></audio>
-                {similarityScore !== null && <h2 className="text-3xl font-bold text-slate-200">{similarityScore === "loading" ? "Loading..." : `Your score is: ${similarityScore.toFixed(2)}`}</h2>}
-                <div className='grid grid-cols-2 gap-4 mt-4 w-full'>
+                {similarityScore !== null && <h2 className="text-3xl font-bold text-slate-200 p-2">{similarityScore === "loading" ? "Loading..." : `Your score is: ${similarityScore.toFixed(2)}`}</h2>}
+                <div className='grid grid-cols-2 gap-4 mt-2 w-full'>
                     <RecordingButton isRecording={isRecording}></RecordingButton>
                     <SubmitButton audioURL={audioURL}></SubmitButton>
                 </div>
+                {/* <div className='grid grid-cols-4 gap-4 mt-4 w-full items-center justify-center'>
+                    <audio className="col-span-3 w-full" controls>
+                        <source src={audio} type="audio/wav"/>
+                    </audio>
+                    <h1 className="col-span-1 text-3xl font-bold text-slate-200 w-full text-center">Score</h1>
+                </div> */}
+                {topScores.length > 0 && <h2 className="text-3xl font-bold text-slate-200 p-2">Top 5 Recordings:</h2>}
+                <ScoreList scores={topScores}/>
             </div>
         </div>
     );
