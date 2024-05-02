@@ -13,6 +13,7 @@ function App() {
     const [audioBlob, setAudioBlob] = useState(null)
     const [similarityScore, setSimilarityScore] = useState(null)
     const [topScores, setTopScores] = useState([])
+    const [showInfo, setShowInfor] = useState(false)
     const mediaStream = useRef(null)
     const audioRecorder = useRef(null)
 
@@ -97,15 +98,34 @@ function App() {
         return <button className="rounded bg-blue-300 p-2 text-slate-200 text-xl">Compare</button>
     }
 
+    function InfoBox({showInfo}){
+        if (showInfo) {
+            return <div className=''>
+                Hello
+            </div>
+        }
+    }
+
     return (
         <div className="flex flex-col items-center h-full w-full font-sans relative">
             <div className="flex flex-col items-center w-full max-w-lg font-sans">
-                <h1 className="text-5xl font-bold text-slate-200 p-5">Voice Compare</h1>
-                <iframe className="w-full aspect-video" src="https://www.youtube.com/embed/PuC40Nk7Ggc?si=qKbIn5QQiRRXlwRX" title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
-                <h2 className="text-3xl font-bold text-slate-200 p-2">Try to copy the clip!</h2>
-                <audio className="w-full" controls>
-                    <source src={audio} type="audio/wav"/>
-                </audio>
+                <div className='flex relative w-full items-center justify-center border-b-2 border-slate-400'>
+                    <h1 className="text-5xl font-bold text-slate-200 p-5">Voice Compare</h1>
+                    <button className='absolute right-0'>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="white" className="w-8 h-8">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div className='w-full items-center justify-center border-b-2 border-slate-400 pb-2'>
+                    <h2 className="text-center text-3xl font-bold text-slate-200 p-2">Imitatee of the Day: Vedan Desai</h2>
+                    <audio className="w-full" controls>
+                        <source src={audio} type="audio/wav"/>
+                    </audio>
+                    <p className='italic text-slate-200'>“'There's iron, they say, in all our blood, And a grain or two perhaps is good; But his, he makes me harshly feel, Has got a little too much of steel.' ANON.”</p>
+                </div>
+                
                 {audioURL !== null && <h2 className="text-3xl font-bold text-slate-200 p-2">Your Recent Recording:</h2>}
                 <audio src={audioURL} className="w-full" controls={audioURL === null ? false : true}></audio>
                 {similarityScore !== null && <h2 className="text-3xl font-bold text-slate-200 p-2">{similarityScore === "loading" ? "Loading..." : `Your score is: ${similarityScore.toFixed(2)}`}</h2>}
