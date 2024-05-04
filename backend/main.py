@@ -63,13 +63,10 @@ async def create_file(data: Data):
 
 @app.post("/audio/")
 async def audio_process(file: UploadFile):
-    audio_bytes = await file.read()    
-    #test_file = open("temp.wav", "wb")
-    #test_file.write(audio_bytes)
-    #test_file.close()
-    waveform, sample_rate = librosa.load(io.BytesIO(audio_bytes), sr=None, mono=True)
+    # audio_bytes = await file.read()    
+    wav, source_sr = librosa.load(file.file, sr=None)
     audio = encoder.embed_utterance(preprocess_wav("test.wav"))
-    compare_audio = encoder.embed_utterance(preprocess_wav(waveform))
+    compare_audio = encoder.embed_utterance(preprocess_wav(wav, source_sr))
     #submission_out = houndifySpeechToText(preprocess_wav(waveform), HOUNDIFY_CLIENT_ID, HOUNDIFY_CLIENT_KEY)
     #comparison_out = houndifySpeechToText(preprocess_wav("test.wav"), HOUNDIFY_CLIENT_ID, HOUNDIFY_CLIENT_KEY)
     #print(submission_out[0])
