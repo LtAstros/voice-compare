@@ -1,5 +1,5 @@
 function ScoreList({scores}) {
-    const renderedList = scores.map(({url,score}) => {
+    const renderedList = scores.toReversed().map(({url,score}) => {
         const id = crypto.randomUUID()
         return (
             <div className='grid grid-cols-4 gap-4' key={id}>
