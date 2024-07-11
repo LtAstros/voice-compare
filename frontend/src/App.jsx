@@ -76,7 +76,7 @@ function App() {
         formData.append("file", audioBlob, 'audio.wav');
         try {
             setSimilarityScore("loading")
-            const response = await fetch('http://127.0.0.1:8000/audio/', {method: "POST", body: formData})
+            const response = await fetch('http://127.0.0.1:8000/api/audio/', {method: "POST", body: formData})
             const data = await response.json();
             setSimilarityScore(data.score);
             updateRecentScores(data.score)
